@@ -1,23 +1,40 @@
 provider "aws" {
-  region  = "us-west-2"
-  profile = "demo"
+  region     = "us-west-2"
+  profile    = "demo"
+  access_key = "AKIA47DNXORG7PIRXO6K"
+  secret_key = "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"
+}
+variable "region" {
+
+  default = "us-west-2"
+
+}
+output "region" {
+  value = var.region
+}
+variable "key_name" {
+  type    = string
+  default = "t2.micro"
 }
 
-variable "key_name" {}
 
 resource "tls_private_key" "example" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource "aws_key_pair" "generated_key" {
-  key_name   = var.key_name
-  public_key = tls_private_key.example.public_key_openssh
+output "private_key" {
+  value = tls_private_key.example.private_key_pem
+}
+
+output "public_key" {
+  value = tls_private_key.example.public_key_openssh
 }
 
 
-resource "aws_security_group" "sg" {
-  name = "aws_security_group.sg"
+resource "aws_security_group" "web" {
+  name   = "aws_security_group.web"
+  vpc_id = aws_vpc.yvot.id
 
   ingress {
     from_port   = 22
@@ -41,8 +58,14 @@ resource "aws_security_group" "sg" {
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 8081
+    to_port     = 8081
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -54,9 +77,14 @@ resource "aws_security_group" "sg" {
   }
 }
 
-output "security_group_id" {
-  value = aws_security_group.sg.id
+resource "aws_key_pair" "ec2" {
+  key_name   = "example-keypair"
+  public_key = file("~/.ssh/ec2.pub")
 }
+
+# output "security_group_id" {
+#   value = aws_security_group.web.id
+# }
 
 # data "template_file" "mysql_install_script" {
 #   template = file("mysql_install_script.sh")
@@ -66,75 +94,78 @@ output "security_group_id" {
 resource "aws_instance" "web" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg.id]
-  key_name               = aws_key_pair.generated_key.key_name
-  # iam_instance_profile   = aws_iam_instance_profile.my_instance_profile.name
-  #   userdata               = <<EOF
+  vpc_security_group_ids = [aws_security_group.web.id]
+  key_name               = aws_key_pair.ec2.key_name
+  iam_instance_profile   = aws_iam_instance_profile.ec2.name
+  subnet_id              = aws_subnet.myprivatesubnet1.id
+  user_data              = <<-EOF
 
-  # #!/bin/bash
+  #!/bin/bash
 
-  # ####################################################
+  ####################################################
 
-  # # Configure Tomcat JAVA_OPTS #
+  # Configure Tomcat JAVA_OPTS #
 
-  # ####################################################
-
-
-  # cd /opt/tomcat/bin
-
-  # touch setenv.sh
-
-  # echo "#!/bin/sh" > setenv.sh
+  ####################################################
 
 
-  # echo "export DB_USERNAME=${var.database_username}" >> /etc/profile.d/myapp.sh
-  # echo "export DB_PASSWORD=${var.database_password}" >> /etc/profile.d/myapp.sh
-  # echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> /etc/profile.d/myapp.sh
-  # echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /etc/profile.d/myapp.sh
-  # chown tomcat:tomcat setenv.sh
+  cd /opt/tomcat/bin
 
-  # chmod +x setenv.sh
+  touch setenv.sh
 
-  # sudo chmod 755 -R /opt/tomcat
+  echo "#!/bin/sh" > setenv.sh
 
-  # # Start Tomcat
-
-  # /bin/bash /opt/tomcat/bin/catalina.sh start
-  # #install mysql client 
+  echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
+  echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
+  echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
 
 
+  chown tomcat:tomcat setenv.sh
 
-  #  EOF
-  #   root_block_device {
-  #     volume_size = var.root_volume_size
-  #     volume_type = var.root_volume_type
-  #   }
+  chmod +x setenv.sh
+  source /home/ubuntu/setenv.sh
 
-  #   lifecycle {
-  #     prevent_destroy = false
-  #   }
-  #   user_data = data.template_file.mysql_install_script.rendered
+  sudo chmod 755 -R /opt/tomcat
 
-  #   tags = {
-  #     Name = "my-instance"
-  #   }
-  #   provisioner "remote-exec" {
-  #     connection {
-  #       type        = "ssh"
-  #       user        = "ec2-user"
-  #       private_key = file("~/.ssh/ec2")
-  #       host        = aws_instance.web.public_ip
-  #     }
+  # Start Tomcat
+  
+  /bin/bash /opt/tomcat/bin/catalina.sh start
+  install mysql client 
 
-  #     inline = [
-  #       "echo hello world"
-  #     ]
-  #   }
+  echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /etc/profile.d/setenv.sh
+  root_block_device {
+    volume_size = var.root_volume_size
+    volume_type = var.root_volume_type
+  }
+
+  lifecycle {
+    prevent_destroy = false
+  }
+  user_data = data.template_file.mysql_install_script.rendered
+
+  tags = {
+    Name = "my-instance"
+  }
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("~/.ssh/ec2")
+      host        = aws_instance.web.public_ip
+    }
+
+    inline = [
+      "echo hello world"
+    ]
+  }
+    EOF
 }
+
+
 
 variable "ami_id" {
   type    = string
-  default = "ami-0846eec981e2d481f"
+  default = "ami-0f4590039ead0ff3e"
 }
 
 variable "instance_type" {
@@ -168,6 +199,99 @@ variable "database_password" {
   default = "examplepass666"
 }
 
+#create s3 bucket
+resource "random_id" "bucket_id" {
+  byte_length = 8
+}
+
+resource "aws_s3_bucket" "private_bucket" {
+  bucket        = "my-bucket-${random_id.bucket_id.hex}"
+  acl           = "private"
+  force_destroy = true
+
+  versioning {
+    enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  lifecycle_rule {
+
+    id      = "transition-to-IA-storage"
+    enabled = true
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+
+    }
+  }
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.private_bucket.id
+}
+
+#IAM 
+
+resource "aws_iam_policy" "webapp_s3_policy" {
+  name = "webapp-s3-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:DeleteObject"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::YOUR_BUCKET_NAME",
+          "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "webapp_s3_attachment" {
+  policy_arn = aws_iam_policy.webapp_s3_policy.arn
+  role       = aws_iam_role.webapp.name
+}
 
 
+
+resource "aws_iam_role" "webapp" {
+  name = "my-ec2-instance"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_instance_profile" "ec2" {
+  name = "iam_ec2"
+  role = aws_iam_role.webapp.name
+}
 

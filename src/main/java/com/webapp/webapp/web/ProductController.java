@@ -19,7 +19,6 @@ import com.webapp.webapp.data.payloads.request.ProductRequest;
 import com.webapp.webapp.service.ProductService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import org.modelmapper.ModelMapper;
 
 @RestController
 @RequestMapping("/v1")
@@ -28,11 +27,12 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
+
     @PostMapping("/product")
     public ResponseEntity<Product> addProduct(@RequestBody ProductRequest productRequest) {
-        ModelMapper mapper = new ModelMapper();
         Product product = new Product();
-
+        System.out.println(productRequest.toString());
+        product=productService.createProduct(productRequest);
         return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
 
@@ -59,7 +59,6 @@ public class ProductController {
     @DeleteMapping("/product/{id}")
     public ResponseEntity<Product> deleteProduct(@PathVariable Integer id) {
         productService.deleteProduct(id);
-        ;
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

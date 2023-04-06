@@ -1,46 +1,62 @@
-# resource "aws_security_group" "db_security_group" {
-#   name_prefix = "db-security-group-"
-#   description = "DB Security Group"
+resource "aws_security_group" "db_security_group" {
+  name_prefix = "db-security-group"
+  description = "DB Security Group"
+  vpc_id      = "vpc-0b0f200a1ede6783b"
 
-#   ingress {
-#     from_port   = 3306
-#     to_port     = 3306
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-# resource "aws_db_parameter_group" "mysql" {
-#   name_prefix = "mysql-parameter-group"
-#   family      = "mysql8.0"
-#   description = "Custom parameter group for MySQL DB"
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
-#   parameter {
-#     name  = "character_set_server"
-#     value = "utf8mb4"
-#   }
+resource "aws_db_subnet_group" "mysql" {
+  name        = "sqldb-subnet-group"
+  description = "sqldb subnet group"
 
-#   parameter {
-#     name  = "collation_server"
-#     value = "utf8mb4_unicode_ci"
-#   }
-# }
-# resource "aws_db_instance" "mysqlDB" {
-#   name                 = "csye6225"
-#   identifier           = "csye6225"
-#   engine               = "mysql"
-#   engine_version       = "5.7"
-#   instance_class       = "db.t3.micro"
-#   allocated_storage    = 10
-#   username             = "csye6225"
-#   password             = "examplepass666"
-#   hostname             = ""
-#   parameter_group_name = aws_db_parameter_group.mysql.id
-#   multi_az             = false
-#   publicly_accessible  = false
-#   subnet_ids = [
-#     "${aws_subnet.myprivatesubnet1.id}",
-#     "${aws_subnet.myprivatesubnet2.id}",
-#     "${aws_subnet.myprivatesubnet3.id}",
-#   ]
-#   vpc_security_group_ids = ["${aws_security_group.db_security_group.id}"]
-# }
+  subnet_ids = [
+    "${aws_subnet.myprivatesubnet1.id}",
+    "${aws_subnet.myprivatesubnet2.id}",
+    "${aws_subnet.myprivatesubnet3.id}",
+  ]
+}
+resource "aws_db_parameter_group" "mysql" {
+  name_prefix = "mysql-parameter-group"
+  family      = "mysql5.7"
+  description = "Custom parameter group for MySQL DB"
+
+
+  parameter {
+    name  = "character_set_server"
+    value = "utf8mb4"
+  }
+
+  parameter {
+    name  = "collation_server"
+    value = "utf8mb4_unicode_ci"
+  }
+
+  parameter {
+    name  = "max_connections"
+    value = "1000"
+  }
+}
+resource "aws_db_instance" "mysqlDB" {
+  db_name           = "csye6225"
+  identifier        = "csye6225"
+  engine            = "mysql"
+  engine_version    = "5.7"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 10
+  username          = "csye6225"
+  password          = "examplepass666"
+
+  multi_az               = false
+  publicly_accessible    = false
+  parameter_group_name   = aws_db_parameter_group.mysql.name
+  db_subnet_group_name   = aws_db_subnet_group.mysql.name
+  vpc_security_group_ids = ["${aws_security_group.db_security_group.id}"]
+}
+
+

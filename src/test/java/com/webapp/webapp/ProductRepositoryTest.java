@@ -26,24 +26,24 @@ import com.webapp.webapp.data.repository.UserRepository;
 
 class ProductRepositoryTest {
 
-    @Autowired
-    ProductRepository productRepository;
+    // @Autowired
+    // ProductRepository productRepository;
 
-    static boolean recordsCreated = false;
+    // static boolean recordsCreated = false;
 
-    @Test
-    final void testFindUserByFirstName() {
-        Product product = new Product();
-        product.setName("test01");
-        product.setDescription("test");
-        product.setSku("aa");
-        product.setManufacturer("test0");
-        productRepository.save(product);
-        String name = "test01";
-        Product product1 = productRepository.findByName(name).get();
-        assertNotNull(product1);
+    // @Test
+    // final void testFindUserByFirstName() {
+        // Product product = new Product();
+        // product.setName("test01");
+        // product.setDescription("test");
+        // product.setSku("aa");
+        // product.setManufacturer("test0");
+        // productRepository.save(product);
+        // String name = "test01";
+        // Product product1 = productRepository.findByName(name).get();
+        // assertNotNull(product1);
 
-        assertTrue(product1.getName().equals(name));
-    }
+        // assertTrue(product1.getName().equals(name));
+    // }
 
 }

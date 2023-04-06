@@ -26,4 +26,4 @@ public class LoginController {
         throw new IllegalStateException(
                 "This method should not be called. This method is implemented by Spring Security");
     }
-}
+} 

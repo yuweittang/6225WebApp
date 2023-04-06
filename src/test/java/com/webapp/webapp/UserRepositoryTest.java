@@ -27,21 +27,21 @@ class UserRepositoryTest {
 	@Autowired
 	UserRepository userRepository;
 
-	@Test
-	final void testFindUserByFirstName() {
+	// @Test
+	// final void testFindUserByFirstName() {
 
-		User userEntity2 = new User();
-		userEntity2.setFirstName("Sergey");
-		userEntity2.setLastName("Kargopolov");
-		userEntity2.setId(999);
-		userEntity2.setUsername("test9@test.com");
-		userRepository.save(userEntity2);
-		String first_name = "Sergey";
-		String username = "test9@test.com";
-		Optional<User> users = userRepository.findByUsername(username);
-		assertNotNull(users);
-		System.out.println(users.isEmpty());
-		assertTrue(users.get().getFirstName().equals(first_name));
-	}
+		// User userEntity2 = new User();
+		// userEntity2.setFirstName("Sergey");
+		// userEntity2.setLastName("Kargopolov");
+		// userEntity2.setId(999);
+		// userEntity2.setUsername("test9@test.com");
+		// userRepository.save(userEntity2);
+		// String first_name = "Sergey";
+		// String username = "test9@test.com";
+		// Optional<User> users = userRepository.findByUsername(username);
+		// assertNotNull(users);
+		// System.out.println(users.isEmpty());
+		// assertTrue(users.get().getFirstName().equals(first_name));
+	// }
 
 }

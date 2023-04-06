@@ -1,7 +1,7 @@
 {
     "variables": {
-        "aws_access_key": "AKIAQ2E42HX4ZYUHNTRD",
-        "aws_secret_key": "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",
+        "aws_access_key": "AKIAQ2E42HX4XHU67BXO",
+        "aws_secret_key": "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",
         "ami_region": "us-west-2",
         "source_ami": "ami-0b029b1931b347543",
         "instance_type": "t2.micro",
@@ -44,11 +44,10 @@
         {
             "type": "shell",
             "inline": [
-                "sudo yum install -y java-1.8.0-openjdk",
+                "sudo yum update -y",
+                "sudo yum install -y java-11-openjdk-devel",
                 "sudo yum install -y tomcat",
-                "sudo chkconfig tomcat on",
-                "sudo service tomcat start",
-                "sudo yum -y install mysql"
+                "sudo service tomcat start"
             ]
         }
     ]
