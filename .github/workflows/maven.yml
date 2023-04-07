@@ -48,8 +48,10 @@ jobs:
           cd ..
           pwd
 
-      - name: install aws
-        run: yum install awscli
+      - name: Install awscli
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
 
       - name: Terraform Apply
         run: cd aws-infra-main
