@@ -17,11 +17,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      AWS_CODE_DEPLOY_BUCKET: ${{bucket_name}}
-      PRIVATE_KEY_PEM: ${{private_key}}
-      PUBLIC_KEY: ${{public_key}}
-      AWS_REGION: ${{region}}
 
     steps:
       - uses: actions/checkout@v3
@@ -67,14 +62,20 @@ jobs:
           cd ..
           terraform init
           terraform apply
-          terraform output
 
       - name: Upload Artifact To S3
+        env:
+          AWS_CODE_DEPLOY_BUCKET: ${{ secrets.bucket_name }}
         run: echo "Uploading to S3 bucket"
           cd codedeploy_artifact
           aws s3 cp csye6225-webapp.zip s3://${AWS_CODE_DEPLOY_BUCKET}
 
       - name: Make CodeDeploy API call
+        env:
+          AWS_CODE_DEPLOY_BUCKET: ${{ secrets.bucket_name }}
+          PRIVATE_KEY_PEM: ${{ secrets.private_key }}
+          PUBLIC_KEY: ${{ secrets.public_key }}
+          AWS_REGION: ${{ secrets.region }}
         run: echo "CodeDeploy"
           aws deploy register-application-revision --region ${AWS_REGION} --application-name csye6225-webapp \
           --s3-location bucket=${AWS_CODE_DEPLOY_BUCKET},key=csye6225-webapp.zip,bundleType=zip
