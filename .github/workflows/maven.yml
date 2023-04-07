@@ -51,7 +51,7 @@ jobs:
           pwd
           cd ..
           pwd
-          ls -al
+
       - name: install aws
         run: yum install awscli
 
