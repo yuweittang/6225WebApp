@@ -31,7 +31,7 @@ jobs:
 
       - name: Build Artifact
         run: mvn clean install
-          cd target/
+          cd target
 
       - name: Zip Artifact
         run: echo "current build number is "
