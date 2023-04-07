@@ -28,10 +28,10 @@ jobs:
           cache: maven
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-
       - name: Build Artifact
-        run: mvn clean install
-          mvn cd target
+        run: |
+          mvn clean install
+          cd target
 
       - name: Zip Artifact
         run: echo "current build number is "
