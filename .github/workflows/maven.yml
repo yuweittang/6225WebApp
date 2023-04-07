@@ -54,7 +54,8 @@ jobs:
           sudo apt-get install -y awscli
 
       - name: Terraform Apply
-        run: cd aws-infra-main
+        run: |
+          cd aws-infra-main
           cd packer
           packer build
           cd ..
