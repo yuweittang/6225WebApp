@@ -55,7 +55,7 @@ jobs:
       - name: install aws
         run: yum install awscli
 
-      - name: terraform
+      - name: Terraform Apply
         run: cd aws-infra-main
           cd packer
           packer build
@@ -63,30 +63,35 @@ jobs:
           terraform init
           terraform apply
 
-      - name: Upload Artifact To S3
+      - name: Set Environment Variables
         env:
-          AWS_CODE_DEPLOY_BUCKET: ${{ secrets.bucket_name }}
+          bucket_name: ${{ steps.apply.outputs.bucket_name }}
+          private_key: ${{ steps.apply.outputs.private_key }}
+          public_key: ${{ steps.apply.outputs.public_key }}
+          region: ${{ steps.apply.outputs.region }}
+        run: |
+          echo "Bucket Name: $bucket_name"
+          echo "Private Key: $private_key"
+          echo "Public Key: $public_key"
+          echo "Region: $region"
+
+      - name: Upload Artifact To S3
         run: echo "Uploading to S3 bucket"
           cd codedeploy_artifact
-          aws s3 cp csye6225-webapp.zip s3://${AWS_CODE_DEPLOY_BUCKET}
+          aws s3 cp csye6225-webapp.zip s3://${bucket_name}
 
       - name: Make CodeDeploy API call
-        env:
-          AWS_CODE_DEPLOY_BUCKET: ${{ secrets.bucket_name }}
-          PRIVATE_KEY_PEM: ${{ secrets.private_key }}
-          PUBLIC_KEY: ${{ secrets.public_key }}
-          AWS_REGION: ${{ secrets.region }}
         run: echo "CodeDeploy"
-          aws deploy register-application-revision --region ${AWS_REGION} --application-name csye6225-webapp \
-          --s3-location bucket=${AWS_CODE_DEPLOY_BUCKET},key=csye6225-webapp.zip,bundleType=zip
+          aws deploy register-application-revision --region ${region} --application-name csye6225-webapp \
+          --s3-location bucket=${bucket_name},key=csye6225-webapp.zip,bundleType=zip
           echo "------------------------------------------------------"
-          aws deploy list-application-revisions --region ${AWS_REGION} --application-name csye6225-webapp \
+          aws deploy list-application-revisions --region ${region} --application-name csye6225-webapp \
           --s-3-bucket code-deploy.csye6225-su19-sebastianc.me --deployed exclude
           echo "------------------------------------------------------"
-          deploymentId=$(aws deploy create-deployment --region ${AWS_REGION} \
+          deploymentId=$(aws deploy create-deployment --region ${region} \
           --application-name csye6225-webapp \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name csye6225-webapp-deployment \
-          --s3-location bucket=${AWS_CODE_DEPLOY_BUCKET},bundleType=zip,key=csye6225-webapp.zip \
+          --s3-location bucket=${bucket_name},bundleType=zip,key=csye6225-webapp.zip \
           --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM,DEPLOYMENT_STOP_ON_REQUEST)
           echo "$deploymentId"
