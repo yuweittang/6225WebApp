@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       aws_access_key_dev: ${{secrets.AWS_DEV_ACCESS_KEY}}
-      aws_secret_key_dev: ${{secrets.AWS_DEV_SECRET_KEY}
+      aws_secret_key_dev: ${{secrets.AWS_DEV_SECRET_KEY}}
       aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
       aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
 
