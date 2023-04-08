@@ -28,7 +28,6 @@ jobs:
           cache: maven
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-
       - name: Build Artifact
         run: |
           mvn clean install
@@ -49,17 +48,16 @@ jobs:
           cd ..
           pwd
 
-      - name: install aws
-        run: yum install awscli
+      - name: Install awscli
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
 
       - name: Terraform Apply
         run: |
           cd aws-infra-main
           cd packer
-
-          packer build
-          packer build my_ami.json
-          echo "::set-output name=ami_id::$(cat /tmp/packer_ami.txt)"
+          packer build ami.json
           cd ..
           terraform init
           terraform apply
