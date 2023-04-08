@@ -30,8 +30,9 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Build Artifact
-        run: mvn clean install
-          cd target/
+        run: |
+          mvn clean install
+          cd target
 
       - name: Zip Artifact
         run: echo "current build number is "
@@ -52,9 +53,13 @@ jobs:
         run: yum install awscli
 
       - name: Terraform Apply
-        run: cd aws-infra-main
+        run: |
+          cd aws-infra-main
           cd packer
+
           packer build
+          packer build my_ami.json
+          echo "::set-output name=ami_id::$(cat /tmp/packer_ami.txt)"
           cd ..
           terraform init
           terraform apply

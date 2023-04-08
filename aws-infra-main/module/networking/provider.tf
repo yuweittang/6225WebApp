@@ -1,8 +1,8 @@
 provider "aws" {
   region     = "us-west-2"
   profile    = "demo"
-  access_key = "AKIA47DNXORG7PIRXO6K"
-  secret_key = "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"
+  access_key = "AKIA47DNXORGZX226LWB"
+  secret_key = "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"
 }
 variable "region" {
 
@@ -17,7 +17,6 @@ variable "key_name" {
   default = "t2.micro"
 }
 
-
 resource "tls_private_key" "example" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -30,7 +29,6 @@ output "private_key" {
 output "public_key" {
   value = tls_private_key.example.public_key_openssh
 }
-
 
 resource "aws_security_group" "web" {
   name   = "aws_security_group.web"
@@ -92,7 +90,7 @@ resource "aws_key_pair" "ec2" {
 
 
 resource "aws_instance" "web" {
-  ami                    = var.ami_id
+  ami                    = var.get_ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.web.id]
   key_name               = aws_key_pair.ec2.key_name
@@ -134,7 +132,7 @@ resource "aws_instance" "web" {
 
   echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /etc/profile.d/setenv.sh
   root_block_device {
-    volume_size = var.root_volume_size
+    volume_size = var.root_volFume_size
     volume_type = var.root_volume_type
   }
 
@@ -161,18 +159,13 @@ resource "aws_instance" "web" {
     EOF
 }
 
-
-
-variable "ami_id" {
-  type    = string
-  default = "ami-0f4590039ead0ff3e"
+variable "get_ami" {
+  type = string
 }
-
 variable "instance_type" {
   type    = string
   default = "t2.micro"
 }
-
 
 
 variable "security_group_name" {
@@ -194,6 +187,7 @@ variable "database_username" {
   type    = string
   default = "csye6225"
 }
+
 variable "database_password" {
   type    = string
   default = "examplepass666"
