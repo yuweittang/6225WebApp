@@ -65,14 +65,15 @@ jobs:
           packer build -var "aws_access_key=${aws_access_key_dev}" -var "aws_secret_key=${aws_secret_key_dev}" ami.json 
           cd ..
           terraform init
-          terraform apply -var" aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}"
+          terraform apply -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}"
+          terraform output
 
       - name: Set Environment Variables
         env:
-          bucket_name: ${{ steps.apply.outputs.bucket_name }}
-          private_key: ${{ steps.apply.outputs.private_key }}
-          public_key: ${{ steps.apply.outputs.public_key }}
-          region: ${{ steps.apply.outputs.region }}
+          bucket_name: ${{ steps.terraform_apply.outputs.bucket_name }}
+          private_key: ${{ steps.terraform_apply.outputs.private_key }}
+          public_key: ${{ steps.terraform_apply.outputs.public_key }}
+          region: ${{ steps.terraform_apply.outputs.region }}
         run: |
           echo "Bucket Name: $bucket_name"
           echo "Private Key: $private_key"
