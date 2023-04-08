@@ -1,8 +1,9 @@
 provider "aws" {
   region     = "us-west-2"
   profile    = "demo"
-  access_key = "AKIA47DNXORGZX226LWB"
-  secret_key = "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"
+  access_key = var.access_key
+  secret_key = var.secret_key
+
 }
 variable "region" {
 
@@ -16,7 +17,10 @@ variable "key_name" {
   type    = string
   default = "t2.micro"
 }
-
+variable "access_key" {
+}
+variable "secret_key" {
+}
 resource "tls_private_key" "example" {
   algorithm = "RSA"
   rsa_bits  = 4096

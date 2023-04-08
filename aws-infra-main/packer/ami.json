@@ -1,7 +1,7 @@
 {
     "variables": {
-        "aws_access_key": "AKIAQ2E42HX47RW37CXR",
-        "aws_secret_key": "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",
+        "aws_access_key": "",
+        "aws_secret_key": "",
         "ami_region": "us-west-2",
         "source_ami": "ami-0b029b1931b347543",
         "instance_type": "t2.micro",

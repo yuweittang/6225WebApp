@@ -17,6 +17,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      aws_access_key_dev: ${{secrets.AWS_DEV_ACCESS_KEY}}
+      aws_secret_key_dev: ${{secrets.AWS_DEV_SECRET_KEY}
+      aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+      aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
 
     steps:
       - uses: actions/checkout@v3
@@ -56,11 +61,11 @@ jobs:
       - name: Terraform Apply
         run: |
           cd aws-infra-main
-          cd packer
-          packer build ami.json
+          cd packer 
+          packer build ami.json -var" aws_access_key=${aws_access_key_dev}" -var "aws_secret_key=${aws_secret_key_dev}"
           cd ..
           terraform init
-          terraform apply
+          terraform apply -var" aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}"
 
       - name: Set Environment Variables
         env:
