@@ -4,6 +4,8 @@ module "mynetwork" {
   cidr                = "10.20.0.0/16"
   security_group_name = "aws_security_group.sg"
   get_ami             = data.aws_ami.ami.id
+  aws_access_key      = ""
+  aws_secret_key      = ""
 }
 provider "aws" {
   region     = "us-west-2"
@@ -18,6 +20,12 @@ data "aws_ami" "ami" {
     name   = "name"
     values = ["csye6225"]
   }
+}
+variable "aws_access_key" {
+
+}
+variable "aws_secret_key" {
+
 }
 
 
