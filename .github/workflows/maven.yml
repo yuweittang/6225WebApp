@@ -67,7 +67,7 @@ jobs:
           packer build -var "aws_access_key=${aws_access_key_dev}" -var "aws_secret_key=${aws_secret_key_dev}" ami.json 
           cd ..
           terraform init
-          terraform apply -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "private_key=${ssh_public}"  -var "private_key=${ssh_private}"
+          terraform apply -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
 
       - name: Get Infrastructure Outputs
         id: outputs
