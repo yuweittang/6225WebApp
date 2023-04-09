@@ -58,6 +58,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y awscli
 
+      - name: Load SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PUB}}" > ~/.ssh/ec2.pub
+          chmod 600 ~/.ssh/ec2.pub
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/ec2.pub
+
       - name: Terraform Apply
         run: |
           cd aws-infra-main
@@ -66,19 +74,12 @@ jobs:
           cd ..
           terraform init
           terraform apply -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}"
-          terraform output
 
-      - name: Set Environment Variables
-        env:
-          bucket_name: ${{ steps.terraform_apply.outputs.bucket_name }}
-          private_key: ${{ steps.terraform_apply.outputs.private_key }}
-          public_key: ${{ steps.terraform_apply.outputs.public_key }}
-          region: ${{ steps.terraform_apply.outputs.region }}
+      - name: Get Infrastructure Outputs
+        id: outputs
         run: |
-          echo "Bucket Name: $bucket_name"
-          echo "Private Key: $private_key"
-          echo "Public Key: $public_key"
-          echo "Region: $region"
+          echo "::set-output name=bucket_name::$(terraform output -raw s3_bucket_name)"
+          echo "::set-output name=region::$(terraform output -raw aws_region)"
 
       - name: Upload Artifact To S3
         run: echo "Uploading to S3 bucket"

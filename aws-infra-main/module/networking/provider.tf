@@ -14,22 +14,6 @@ variable "region" {
 output "region" {
   value = var.region
 }
-variable "key_name" {
-  type    = string
-  default = "t2.micro"
-}
-resource "tls_private_key" "example" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-output "private_key" {
-  value = tls_private_key.example.private_key_pem
-}
-
-output "public_key" {
-  value = tls_private_key.example.public_key_openssh
-}
 
 resource "aws_security_group" "web" {
   name   = "aws_security_group.web"
