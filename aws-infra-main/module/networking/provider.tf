@@ -5,6 +5,7 @@ provider "aws" {
   secret_key = var.aws_secret_key
 
 }
+
 variable "region" {
 
   default = "us-west-2"
@@ -161,6 +162,13 @@ resource "aws_instance" "web" {
 
 variable "get_ami" {
   type = string
+}
+
+variable "aws_access_key" {
+
+}
+variable "aws_secret_key" {
+
 }
 variable "instance_type" {
   type    = string
