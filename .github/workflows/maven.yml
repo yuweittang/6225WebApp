@@ -22,6 +22,8 @@ jobs:
       aws_secret_key_dev: ${{secrets.AWS_DEV_SECRET_KEY}}
       aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
       aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
+      ssh_public: ${{secrets.SSH_PUB}}
+      ssh_private: ${{secrets.SSH_PRIVATE}}
 
     steps:
       - uses: actions/checkout@v3
@@ -58,15 +60,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y awscli
 
-      - name: Load SSH key
-        run: |
-          sudo apt-get install libcrypto
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PUB}}" > ~/.ssh/ec2.pub
-          chmod 600 ~/.ssh/ec2.pub
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/ec2.pub
-
       - name: Terraform Apply
         run: |
           cd aws-infra-main
@@ -74,7 +67,7 @@ jobs:
           packer build -var "aws_access_key=${aws_access_key_dev}" -var "aws_secret_key=${aws_secret_key_dev}" ami.json 
           cd ..
           terraform init
-          terraform apply -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}"
+          terraform apply -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "private_key=${ssh_public}"  -var "private_key=${ssh_private}"
 
       - name: Get Infrastructure Outputs
         id: outputs

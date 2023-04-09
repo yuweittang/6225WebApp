@@ -62,7 +62,7 @@ resource "aws_security_group" "web" {
 
 resource "aws_key_pair" "ec2" {
   key_name   = "example-keypair"
-  public_key = file("~/.ssh/ec2.pub")
+  public_key = var.public_key
 }
 
 # output "security_group_id" {
@@ -133,7 +133,7 @@ resource "aws_instance" "web" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = file("~/.ssh/ec2")
+      private_key = var.private_key
       host        = aws_instance.web.public_ip
     }
 
