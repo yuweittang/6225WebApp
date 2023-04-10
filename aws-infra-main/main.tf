@@ -6,8 +6,6 @@ module "mynetwork" {
   get_ami             = data.aws_ami.ami.id
   aws_access_key      = var.aws_access_key
   aws_secret_key      = var.aws_secret_key
-  public_key          = var.public_key
-  private_key         = var.private_key
 
 }
 provider "aws" {
@@ -32,15 +30,7 @@ variable "aws_access_key" {
 variable "aws_secret_key" {
 
 }
-variable "public_key" {
 
-
-}
-
-variable "private_key" {
-
-
-}
 
 
 

@@ -6,11 +6,13 @@ provider "aws" {
 
 }
 
+
 variable "region" {
 
   default = "us-west-2"
 
 }
+
 output "region" {
   value = var.region
 }
@@ -62,7 +64,7 @@ resource "aws_security_group" "web" {
 
 resource "aws_key_pair" "ec2" {
   key_name   = "example-keypair"
-  public_key = var.public_key
+  public_key = file("~/.ssh/ec2.pub")
 }
 
 # output "security_group_id" {
@@ -81,7 +83,13 @@ resource "aws_instance" "web" {
   key_name               = aws_key_pair.ec2.key_name
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
   subnet_id              = aws_subnet.myprivatesubnet1.id
-  user_data              = <<-EOF
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = var.ssh_private
+    timeout     = "2m"
+  }
+  user_data = <<-EOF
 
   #!/bin/bash
 
