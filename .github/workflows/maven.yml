@@ -24,8 +24,6 @@ jobs:
     env:
       aws_access_key_dev: ${{secrets.AWS_DEV_ACCESS_KEY}}
       aws_secret_key_dev: ${{secrets.AWS_DEV_SECRET_KEY}}
-      aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
-      aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
       ssh_public: ${{secrets.SSH_PUB}}
       ssh_private: ${{secrets.SSH_PRIVATE}}
 
@@ -63,8 +61,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
-
       - name: Terraform Apply
+        env:
+          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
         run: |
           cd aws-infra-main
           terraform init
