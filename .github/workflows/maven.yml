@@ -61,6 +61,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
+      - name: Configure AWS credentials
+        env:
+          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
+        run: |
+          aws configure set aws_access_key_id $aws_access_key_demo --profile demo
+          aws configure set aws_secret_access_key $aws_secret_key_demo --profile demo
+
       - name: Terraform Apply
         env:
           aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
