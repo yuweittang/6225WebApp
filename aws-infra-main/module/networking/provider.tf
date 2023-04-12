@@ -62,10 +62,10 @@ resource "aws_security_group" "web" {
   }
 }
 
-resource "aws_key_pair" "ec2" {
-  key_name   = "example-keypair"
-  public_key = file("~/.ssh/ec2.pub")
-}
+# resource "aws_key_pair" "ec2" {
+#   key_name   = "example-keypair"
+#   public_key = file("~/.ssh/ec2.pub")
+# }
 
 # output "security_group_id" {
 #   value = aws_security_group.web.id
@@ -80,7 +80,7 @@ resource "aws_instance" "web" {
   ami                    = var.get_ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.web.id]
-  key_name               = aws_key_pair.ec2.key_name
+  key_name               = var.public_key
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
   subnet_id              = aws_subnet.myprivatesubnet1.id
   connection {
