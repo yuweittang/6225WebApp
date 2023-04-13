@@ -1,7 +1,7 @@
 resource "aws_security_group" "db_security_group" {
   name_prefix = "db-security-group"
   description = "DB Security Group"
-  vpc_id      = "vpc-0b0f200a1ede6783b"
+  vpc_id      = aws_vpc.yvot.id
 
   ingress {
     from_port   = 3306
