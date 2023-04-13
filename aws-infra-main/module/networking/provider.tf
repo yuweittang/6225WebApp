@@ -92,12 +92,6 @@ resource "aws_instance" "web" {
 
   #!/bin/bash
 
-  ####################################################
-
-  # Configure Tomcat JAVA_OPTS #
-
-  ####################################################
-
 
   cd /opt/tomcat/bin
 
@@ -137,17 +131,6 @@ resource "aws_instance" "web" {
   tags = {
     Name = "my-instance"
   }
-  provisioner "remote-exec" {
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = var.private_key
-      host        = aws_instance.web.public_ip
-   }
-
-    inline = [
-      "echo hello world"
-    ]
   }
     EOF
 }
