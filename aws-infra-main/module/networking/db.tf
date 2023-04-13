@@ -15,6 +15,7 @@ resource "aws_db_subnet_group" "mysql" {
   name        = "sqldb-subnet-group"
   description = "sqldb subnet group"
 
+
   subnet_ids = [
     "${aws_subnet.myprivatesubnet1.id}",
     "${aws_subnet.myprivatesubnet2.id}",
@@ -40,6 +41,10 @@ resource "aws_db_parameter_group" "mysql" {
   parameter {
     name  = "max_connections"
     value = "1000"
+  }
+  parameter {
+    name  = "innodb_buffer_pool_size"
+    value = "2147483648"
   }
 }
 resource "aws_db_instance" "mysqlDB" {
