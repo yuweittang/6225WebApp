@@ -113,16 +113,17 @@ resource "aws_instance" "web" {
   chown tomcat:tomcat setenv.sh
 
   chmod +x setenv.sh
-  source /home/ubuntu/setenv.sh
+  source /opt/tomcat/bin/setenv.sh
 
   sudo chmod 755 -R /opt/tomcat
 
   # Start Tomcat
   
   /bin/bash /opt/tomcat/bin/catalina.sh start
-  install mysql client 
-
-  echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /etc/profile.d/setenv.sh
+  yum install mysql client 
+  mysql -h ${aws_db_instance.mysqlDB.endpoint} -u ${var.database_username} -p${var.database_password} -e "CREATE DATABASE csye6225"
+  echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /opt/tomcat/bin/setenv.sh
+  
   root_block_device {
     volume_size = var.root_volFume_size
     volume_type = var.root_volume_type
@@ -142,13 +143,17 @@ resource "aws_instance" "web" {
       user        = "ec2-user"
       private_key = var.private_key
       host        = aws_instance.web.public_ip
-    }
+   }
 
     inline = [
       "echo hello world"
     ]
   }
     EOF
+}
+
+output "instance_public_ip" {
+  value = aws_instance.web.public_ip
 }
 variable "public_key" {
   type = string

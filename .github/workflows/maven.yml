@@ -61,6 +61,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
+      - name: Install SSH
+        run: sudo apt-get install -y ssh
+
       - name: Configure AWS credentials
         env:
           aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
@@ -81,13 +84,19 @@ jobs:
       - name: Get Infrastructure Outputs
         id: outputs
         run: |
-          echo "::set-output name=bucket_name::$(terraform output -raw s3_bucket_name)"
-          echo "::set-output name=region::$(terraform output -raw aws_region)"
+          echo "::set-output name=ip::$(terraform output instance_public_ip)"
 
-      - name: Upload Artifact To S3
-        run: echo "Uploading to S3 bucket"
-          cd codedeploy_artifact
-          aws s3 cp csye6225-webapp.zip s3://${bucket_name}
+      - name: Copy Java ZIP file to EC2 instance
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ steps.outputs.outputs.ip }}
+          username: ec2
+          key: ${{ secrets.SSH_PRIVATE }}
+          source: /codedeploy_artifact/csye6225-web-app.zip
+          target: /home/tomcat/csye6225-web-app.zip
+
+      - name: Extract Java ZIP file on EC2 instance
+        run: ssh -i ${{ secrets.SSH_PRIVATE}} ec2@${{ steps.outputs.outputs.ip }} "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
 
       - name: Make CodeDeploy API call
         run: echo "CodeDeploy"
@@ -95,7 +104,7 @@ jobs:
           --s3-location bucket=${bucket_name},key=csye6225-webapp.zip,bundleType=zip
           echo "------------------------------------------------------"
           aws deploy list-application-revisions --region ${region} --application-name csye6225-webapp \
-          --s-3-bucket code-deploy.csye6225-su19-sebastianc.me --deployed exclude
+          --s-3-bucket code-deploy.csye6225 --deployed exclude
           echo "------------------------------------------------------"
           deploymentId=$(aws deploy create-deployment --region ${region} \
           --application-name csye6225-webapp \
