@@ -64,4 +64,11 @@ resource "aws_db_instance" "mysqlDB" {
   vpc_security_group_ids = ["${aws_security_group.db_security_group.id}"]
 }
 
+resource "null_resource" "example" {
+  provisioner "local-exec" {
+    command = "mysql -h ${aws_db_instance.example.endpoint} -u ${aws_db_instance.example.username} -p${aws_db_instance.example.password} -e \"CREATE DATABASE csye6225\""
+  }
+
+  depends_on = [aws_db_instance.mysqlDB]
+}
 

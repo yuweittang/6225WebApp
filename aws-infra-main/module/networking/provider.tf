@@ -115,7 +115,7 @@ resource "aws_instance" "web" {
   
   /bin/bash /opt/tomcat/bin/catalina.sh start
   yum install mysql client 
-  mysql -h ${aws_db_instance.mysqlDB.endpoint} -u ${var.database_username} -p${var.database_password} -e "CREATE DATABASE csye6225"
+
   echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /opt/tomcat/bin/setenv.sh
   
   root_block_device {
@@ -126,7 +126,6 @@ resource "aws_instance" "web" {
   lifecycle {
     prevent_destroy = false
   }
-  user_data = data.template_file.mysql_install_script.rendered
 
   tags = {
     Name = "my-instance"
