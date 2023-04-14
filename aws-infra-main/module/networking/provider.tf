@@ -88,6 +88,7 @@ resource "aws_instance" "web" {
     private_key = var.ssh_private
     timeout     = "2m"
   }
+
   user_data = <<-EOF
 
   #!/bin/bash
