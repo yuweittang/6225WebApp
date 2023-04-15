@@ -88,8 +88,9 @@ resource "aws_instance" "web" {
     private_key = var.ssh_private
     timeout     = "2m"
   }
+}
 
- 
+
 output "instance_public_ip" {
   value = aws_instance.web.public_ip
 }
