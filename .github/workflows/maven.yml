@@ -71,6 +71,13 @@ jobs:
         run: |
           aws configure set aws_access_key_id $aws_access_key_demo --profile demo
           aws configure set aws_secret_access_key $aws_secret_key_demo --profile demo
+      - name: Add SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Terraform Apply
         env:
