@@ -82,9 +82,14 @@ resource "aws_instance" "web" {
   key_name               = var.public_key
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
   subnet_id              = aws_subnet.myprivatesubnet1.id
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = var.ssh_private
+    timeout     = "2m"
+  }
 
-}
-
+ 
 output "instance_public_ip" {
   value = aws_instance.web.public_ip
 }
