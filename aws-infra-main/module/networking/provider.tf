@@ -61,10 +61,15 @@ resource "aws_security_group" "web" {
   }
 }
 
-# resource "aws_key_pair" "ec2" {
-#   key_name   = "example-keypair"
-#   public_key = file("~/.ssh/ec2.pub")
-# }
+resource "aws_key_pair" "ec2_public" {
+  key_name   = "public-keypair"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
+resource "aws_key_pair" "ec2_private" {
+  key_name   = "private-keypair"
+  public_key = file("~/.ssh/id_rsa")
+}
 
 # output "security_group_id" {
 #   value = aws_security_group.web.id
@@ -79,13 +84,13 @@ resource "aws_instance" "web" {
   ami                    = var.get_ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.web.id]
-  key_name               = file("~/.ssh/id_rsa.pub")
+  key_name               = aws_key_pair.ec2_public.key_name
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
   subnet_id              = aws_subnet.myprivatesubnet1.id
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("~/.ssh/id_rsa")
+    private_key = aws_key_pair.ec2_private.key_name
     timeout     = "2m"
   }
 
