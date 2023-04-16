@@ -79,10 +79,60 @@ resource "aws_instance" "web" {
   ami                    = var.get_ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.web.id]
-  key_name               = var.public_key
+  key_name               = file("~/.ssh/id_rsa.pub")
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
   subnet_id              = aws_subnet.myprivatesubnet1.id
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("~/.ssh/id_rsa")
+    timeout     = "2m"
+  }
 
+  user_data = <<-EOF
+
+  #!/bin/bash
+
+
+  cd /opt/tomcat/bin
+
+  touch setenv.sh
+
+  echo "#!/bin/sh" > setenv.sh
+
+  echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
+  echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
+  echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
+
+
+  chown tomcat:tomcat setenv.sh
+
+  chmod +x setenv.sh
+  source /opt/tomcat/bin/setenv.sh
+
+  sudo chmod 755 -R /opt/tomcat
+
+  # Start Tomcat
+  
+  /bin/bash /opt/tomcat/bin/catalina.sh start
+  yum install mysql client 
+
+  echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /opt/tomcat/bin/setenv.sh
+  
+  root_block_device {
+    volume_size = var.root_volFume_size
+    volume_type = var.root_volume_type
+  }
+
+  lifecycle {
+    prevent_destroy = false
+  }
+
+  tags = {
+    Name = "my-instance"
+  }
+  }
+    EOF
 }
 
 output "instance_public_ip" {
