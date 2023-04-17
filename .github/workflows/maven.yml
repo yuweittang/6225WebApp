@@ -29,12 +29,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      # - name: Set up JDK 11
-      #   uses: actions/setup-java@v3
-      #   with:
-      #     java-version: "11"
-      #     distribution: "temurin"
-      #     cache: maven
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: maven
       # - name: Build with Maven
       #   run: mvn -B package --file pom.xml
       # - name: Build Artifact
@@ -57,39 +57,39 @@ jobs:
       #     cd ..
       #     pwd
 
-      - name: Install awscli
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-      - name: Install SSH
-        run: sudo apt-get install -y ssh
+      # - name: Install awscli
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y awscli
+      # - name: Install SSH
+      #   run: sudo apt-get install -y ssh
 
-      - name: Configure AWS credentials
-        env:
-          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
-          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
-        run: |
-          aws configure set aws_access_key_id $aws_access_key_demo --profile demo
-          aws configure set aws_secret_access_key $aws_secret_key_demo --profile demo
-      - name: Add SSH key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE }}
-          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUB}}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa.pub
+      # - name: Configure AWS credentials
+      #   env:
+      #     aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+      #     aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
+      #   run: |
+      #     aws configure set aws_access_key_id $aws_access_key_demo --profile demo
+      #     aws configure set aws_secret_access_key $aws_secret_key_demo --profile demo
+      # - name: Add SSH key
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE }}
+      #     SSH_PUBLIC_KEY: ${{ secrets.SSH_PUB}}
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+      #     echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
+      #     chmod 600 ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa.pub
 
-      - name: Terraform Apply
-        env:
-          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
-          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
-        run: |
-          cd aws-infra-main
-          terraform init
-          terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
+      # - name: Terraform Apply
+      #   env:
+      #     aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+      #     aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
+      #   run: |
+      #     cd aws-infra-main
+      #     terraform init
+      #     terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
 
       - name: Get Infrastructure Outputs
         id: outputs
@@ -97,13 +97,9 @@ jobs:
           echo "::set-output name=ip::$(terraform output instance_public_ip)"
 
       - name: Copy Java ZIP file to EC2 instance
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ steps.outputs.outputs.ip }}
-          username: ec2
-          key: ${{ secrets.SSH_PRIVATE }}
-          source: /codedeploy_artifact/csye6225-web-app.zip
-          target: /home/tomcat/csye6225-web-app.zip
+        run: |
+          IP=$(echo ${{ steps.outputs.outputs.ip }})
+          scp -i ~/.ssh/id_rsa codedeploy_artifact/csye6225-web-app.zip user@$IP:/home/tomcat/
 
       - name: Extract Java ZIP file on EC2 instance
         run: ssh -i ${{ secrets.SSH_PRIVATE}} ec2@${{ steps.outputs.outputs.ip }} "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
