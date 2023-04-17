@@ -44,7 +44,7 @@ resource "aws_db_parameter_group" "mysql" {
   }
   parameter {
     name  = "innodb_buffer_pool_size"
-    value = "2147483648"
+    value = "{DBInstanceClassMemory*3/4}"
   }
 }
 resource "aws_db_instance" "mysqlDB" {

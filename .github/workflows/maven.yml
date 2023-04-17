@@ -35,66 +35,66 @@ jobs:
           java-version: "11"
           distribution: "temurin"
           cache: maven
-      # - name: Build with Maven
-      #   run: mvn -B package --file pom.xml
-      # - name: Build Artifact
-      #   run: |
-      #     mvn clean install
-      #     cd target
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Build Artifact
+        run: |
+          mvn clean install
+          cd target
 
-      # - name: Zip Artifact
-      #   run: echo "current build number is "
-      #     pwd
-      #     mkdir -p codedeploy_artifact
-      #     cd codedeploy_artifact
-      #     cp ../pom.xml .
-      #     cp ../target/webapp-0.0.1-SNAPSHOT.jar .
-      #     cp ../src/main/resources/*.properties .
-      #     zip -r csye6225-web-app.zip .
-      #     rm *.xml *.properties *.jar
-      #     ls -al
-      #     pwd
-      #     cd ..
-      #     pwd
+      - name: Zip Artifact
+        run: echo "current build number is "
+          pwd
+          mkdir -p codedeploy_artifact
+          cd codedeploy_artifact
+          cp ../pom.xml .
+          cp ../target/webapp-0.0.1-SNAPSHOT.jar .
+          cp ../src/main/resources/*.properties .
+          zip -r csye6225-web-app.zip .
+          rm *.xml *.properties *.jar
+          ls -al
+          pwd
+          cd ..
+          pwd
 
-      # - name: Install awscli
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y awscli
-      # - name: Install SSH
-      #   run: sudo apt-get install -y ssh
+      - name: Install awscli
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+      - name: Install SSH
+        run: sudo apt-get install -y ssh
 
-      # - name: Configure AWS credentials
-      #   env:
-      #     aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
-      #     aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
-      #   run: |
-      #     aws configure set aws_access_key_id $aws_access_key_demo --profile demo
-      #     aws configure set aws_secret_access_key $aws_secret_key_demo --profile demo
-      # - name: Add SSH key
-      #   env:
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE }}
-      #     SSH_PUBLIC_KEY: ${{ secrets.SSH_PUB}}
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-      #     echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
-      #     chmod 600 ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa.pub
+      - name: Configure AWS credentials
+        env:
+          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
+        run: |
+          aws configure set aws_access_key_id $aws_access_key_demo --profile demo
+          aws configure set aws_secret_access_key $aws_secret_key_demo --profile demo
+      - name: Add SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE }}
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUB}}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa.pub
 
-      # - name: Terraform Apply
-      #   env:
-      #     aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
-      #     aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
-      #   run: |
-      #     cd aws-infra-main
-      #     terraform init
-      #     terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
+      - name: Terraform Apply
+        env:
+          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
+          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
+        run: |
+          cd aws-infra-main
+          terraform init
+          terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
 
       - name: Get Infrastructure Outputs
         id: outputs
         run: |
-          echo "::set-output name=ip::$(terraform output instance_public_ip)"
+          echo "IP=${{ terraform output instance_public_ip }}" >> $GITHUB_ENV
 
       - name: Copy Java ZIP file to EC2 instance
         run: |
