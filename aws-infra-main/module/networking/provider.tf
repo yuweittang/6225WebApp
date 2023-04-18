@@ -84,6 +84,7 @@ resource "aws_security_group" "web" {
 
 resource "aws_instance" "web" {
   ami                         = var.get_ami
+  key_name                    = "public-keypair"
   instance_type               = var.instance_type
   vpc_security_group_ids      = [aws_security_group.web.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2.name
@@ -101,7 +102,7 @@ resource "aws_instance" "web" {
   #!/bin/bash
 
 
-  cd /opt/tomcat/bin
+  cd /usr/local/tomcat/bin
 
   touch setenv.sh
 
@@ -115,13 +116,13 @@ resource "aws_instance" "web" {
   chown tomcat:tomcat setenv.sh
 
   chmod +x setenv.sh
-  source /opt/tomcat/bin/setenv.sh
+  source /usr/local/tomcat/bin/setenv.sh
 
   sudo chmod 755 -R /opt/tomcat
 
   # Start Tomcat
   
-  /bin/bash /opt/tomcat/bin/catalina.sh start
+  sudo /usr/local/tomcat/bin/startup.sh
   yum install mysql client 
 
   echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /opt/tomcat/bin/setenv.sh
