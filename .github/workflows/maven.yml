@@ -81,9 +81,8 @@ jobs:
           echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa.pub
-
       - name: Terraform Apply
-        id: outputs
+        id: terraform-apply
         env:
           aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
           aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
@@ -91,19 +90,17 @@ jobs:
           cd aws-infra-main
           terraform init
           terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
-
-      - name: Get Infrastructure Outputs
-        run: |
-          echo "ip=${{ steps.outputs.outputs.instance_public_ip }}" >> $GITHUB_ENV
+          INSTANCE_PUBLIC_IP=$(terraform output instance_public_ip)
+          echo "ip=${INSTANCE_PUBLIC_IP}" >> $GITHUB_ENV
 
       - name: Copy Java ZIP file to EC2 instance
         run: |
-          scp -i ~/.ssh/id_rsa codedeploy_artifact/csye6225-web-app.zip ec2-user@${{env.ip}}:/home/tomcat/csye6225-web-app.zip
+          scp -i ~/.ssh/id_rsa codedeploy_artifact/csye6225-web-app.zip ec2-user@${{ env.ip  }}:/home/tomcat/csye6225-web-app.zip
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ~/.ssh/id_rsa ec2-user@${{env.ip}} "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
+          ssh -i ~/.ssh/id_rsa ec2-user@${{ env.ip }} "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
 
       - name: Start application on EC2 using screen
         run: |
-          ssh -i ~/.ssh/id_rsa ec2-user@${{env.ip}} "screen -dmS csye6225-web-app java -jar /opt/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
+          ssh -i ~/.ssh/id_rsa ec2-user@${{ env.ip  }} "screen -dmS csye6225-web-app java -jar /opt/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
