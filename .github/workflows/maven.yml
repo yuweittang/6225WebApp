@@ -83,14 +83,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa.pub
       - name: Terraform Apply
         id: terraform-apply
-        env:
-          aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
-          aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
         run: |
           cd aws-infra-main
           terraform init
           terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
-          INSTANCE_PUBLIC_IP=$(terraform output instance_public_ip)
+          INSTANCE_PUBLIC_IP=$(terraform output public_ip)
           echo "ip=${INSTANCE_PUBLIC_IP}" >> $GITHUB_ENV
 
       - name: Copy Java ZIP file to EC2 instance
