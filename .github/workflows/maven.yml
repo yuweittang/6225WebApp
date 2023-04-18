@@ -78,7 +78,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/ec2
-          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/ec2
 
       - name: Terraform Apply
         id: terraform-apply
