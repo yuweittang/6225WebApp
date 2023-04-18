@@ -99,12 +99,12 @@ jobs:
       - name: Copy Java ZIP file to EC2 instance
         run: |
           IP=$(echo ${{ steps.outputs.outputs.ip }})
-          scp -i ${{ secrets.SSH_PRIVATE}} codedeploy_artifact/csye6225-web-app.zip user@$IP:/home/tomcat/csye6225-web-app.zip
+          scp -i ~/.ssh/id_rsa codedeploy_artifact/csye6225-web-app.zip user@$IP:/home/tomcat/csye6225-web-app.zip
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE}} ec2@$IP "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
+          ssh -i ~/.ssh/id_rsa ec2@$IP "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
 
       - name: Start application on EC2 using screen
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE}} ec2@$IP "screen -dmS csye6225-web-app java -jar /opt/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
+          ssh -i ~/.ssh/id_rsa ec2@$IP "screen -dmS csye6225-web-app java -jar /opt/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
