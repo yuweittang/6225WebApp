@@ -99,23 +99,12 @@ jobs:
       - name: Copy Java ZIP file to EC2 instance
         run: |
           IP=$(echo ${{ steps.outputs.outputs.ip }})
-          scp -i ~/.ssh/id_rsa codedeploy_artifact/csye6225-web-app.zip user@$IP:/home/tomcat/csye6225-web-app.zip
+          scp -i ${{ secrets.SSH_PRIVATE}} codedeploy_artifact/csye6225-web-app.zip user@$IP:/home/tomcat/csye6225-web-app.zip
 
       - name: Extract Java ZIP file on EC2 instance
-        run: ssh -i ${{ secrets.SSH_PRIVATE}} ec2@${{ steps.outputs.outputs.ip }} "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE}} ec2@$IP "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
 
-      - name: Make CodeDeploy API call
-        run: echo "CodeDeploy"
-          aws deploy register-application-revision --region ${region} --application-name csye6225-webapp \
-          --s3-location bucket=${bucket_name},key=csye6225-webapp.zip,bundleType=zip
-          echo "------------------------------------------------------"
-          aws deploy list-application-revisions --region ${region} --application-name csye6225-webapp \
-          --s-3-bucket code-deploy.csye6225 --deployed exclude
-          echo "------------------------------------------------------"
-          deploymentId=$(aws deploy create-deployment --region ${region} \
-          --application-name csye6225-webapp \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name csye6225-webapp-deployment \
-          --s3-location bucket=${bucket_name},bundleType=zip,key=csye6225-webapp.zip \
-          --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE,DEPLOYMENT_STOP_ON_ALARM,DEPLOYMENT_STOP_ON_REQUEST)
-          echo "$deploymentId"
+      - name: Start application on EC2 using screen
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE}} ec2@$IP "screen -dmS csye6225-web-app java -jar /opt/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
