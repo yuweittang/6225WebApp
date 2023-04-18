@@ -84,7 +84,7 @@ resource "aws_security_group" "web" {
 
 resource "aws_instance" "web" {
   ami                         = var.get_ami
-  key_name                    = "public-keypair"
+  key_name                    = "ec2"
   instance_type               = var.instance_type
   vpc_security_group_ids      = [aws_security_group.web.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2.name

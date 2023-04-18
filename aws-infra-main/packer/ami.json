@@ -46,8 +46,11 @@
             "inline": [
                 "sudo yum update -y",
                 "sudo amazon-linux-extras install java-openjdk11",
-                "sudo yum install -y tomcat",
-                "sudo systemctl start tomcat"
+                "wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz",
+                "tar xvzf apache-tomcat-9.0.74.tar.gz",
+                "sudo mv apache-tomcat-9.0.74 /usr/local/tomcat",
+                "export CATALINA_HOME=/usr/local/tomcat",
+                "sudo chmod +x /usr/local/tomcat/bin/*.sh"
             ]
         }
     ]
