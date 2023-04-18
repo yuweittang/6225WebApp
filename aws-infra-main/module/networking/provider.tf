@@ -146,12 +146,12 @@ resource "aws_instance" "web" {
 output "public_ip" {
   value = aws_instance.web.public_ip
 }
-# variable "public_key" {
-#   type = string
-# }
-# variable "private_key" {
-#   type = string
-# }
+variable "public_key" {
+  type = string
+}
+variable "private_key" {
+  type = string
+}
 
 variable "get_ami" {
   type = string
