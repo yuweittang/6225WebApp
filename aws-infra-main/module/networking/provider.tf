@@ -83,12 +83,12 @@ resource "aws_key_pair" "ec2_private" {
 
 
 resource "aws_instance" "web" {
-  ami                    = var.get_ami
-  instance_type          = var.instance_type
-  vpc_security_group_ids = [aws_security_group.web.id]
-  key_name               = aws_key_pair.ec2_public.key_name
-  iam_instance_profile   = aws_iam_instance_profile.ec2.name
-  subnet_id              = aws_subnet.mypublicsubnet3.id
+  ami                         = var.get_ami
+  instance_type               = var.instance_type
+  vpc_security_group_ids      = [aws_security_group.web.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  subnet_id                   = aws_subnet.mypublicsubnet3.id
+  associate_public_ip_address = true
   connection {
     type        = "ssh"
     user        = "ec2-user"
