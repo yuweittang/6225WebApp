@@ -90,12 +90,12 @@ resource "aws_instance" "web" {
   iam_instance_profile        = aws_iam_instance_profile.ec2.name
   subnet_id                   = aws_subnet.mypublicsubnet3.id
   associate_public_ip_address = true
-  connection {
-    type        = "ssh"
-    user        = "ec2-user"
-    private_key = file("~/.ssh/id_rsa")
-    timeout     = "2m"
-  }
+  # connection {
+  #   type        = "ssh"
+  #   user        = "ec2-user"
+  #   private_key = file("~/.ssh/ec2")
+  #   timeout     = "2m"
+  # }
 
   user_data = <<-EOF
 
