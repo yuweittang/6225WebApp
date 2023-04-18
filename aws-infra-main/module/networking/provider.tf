@@ -92,7 +92,7 @@ resource "aws_instance" "web" {
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = aws_key_pair.ec2_private.key_name
+    private_key = file("~/.ssh/id_rsa")
     timeout     = "2m"
   }
 
