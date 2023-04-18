@@ -77,6 +77,8 @@ resource "aws_key_pair" "ec2_private" {
 
 # data "template_file" "mysql_install_script" {
 #   template = file("mysql_install_script.sh")
+#var.aws_access_key
+#var.aws_secret_key
 # }
 
 
@@ -86,7 +88,7 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = [aws_security_group.web.id]
   key_name               = aws_key_pair.ec2_public.key_name
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
-  subnet_id              = aws_subnet.myprivatesubnet1.id
+  subnet_id              = aws_subnet.mypublicsubnet3.id
   connection {
     type        = "ssh"
     user        = "ec2-user"
