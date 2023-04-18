@@ -83,6 +83,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa.pub
 
       - name: Terraform Apply
+        id: outputs
         env:
           aws_access_key_demo: ${{secrets.AWS_DEMO_ACCESS_KEY}}
           aws_secret_key_demo: ${{secrets.AWS_DEMO_SECRET_KEY}}
@@ -92,7 +93,6 @@ jobs:
           terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" -var "public_key=${ssh_public}"  -var "private_key=${ssh_private}"
 
       - name: Get Infrastructure Outputs
-        id: outputs
         run: |
           echo "ip=${{ steps.outputs.outputs.instance_public_ip }}" >> $GITHUB_ENV
 
