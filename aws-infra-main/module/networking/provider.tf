@@ -61,15 +61,15 @@ resource "aws_security_group" "web" {
   }
 }
 
-resource "aws_key_pair" "ec2_public" {
-  key_name   = "public-keypair"
-  public_key = file("~/.ssh/id_rsa.pub")
-}
+# resource "aws_key_pair" "ec2_public" {
+#   key_name   = "public-keypair"
+#   public_key = file("~/.ssh/id_rsa.pub")
+# }
 
-resource "aws_key_pair" "ec2_private" {
-  key_name   = "private-keypair"
-  public_key = file("~/.ssh/id_rsa")
-}
+# resource "aws_key_pair" "ec2_private" {
+#   key_name   = "private-keypair"
+#   public_key = file("~/.ssh/id_rsa")
+# }
 
 # output "security_group_id" {
 #   value = aws_security_group.web.id
@@ -146,12 +146,12 @@ resource "aws_instance" "web" {
 output "public_ip" {
   value = aws_instance.web.public_ip
 }
-variable "public_key" {
-  type = string
-}
-variable "private_key" {
-  type = string
-}
+# variable "public_key" {
+#   type = string
+# }
+# variable "private_key" {
+#   type = string
+# }
 
 variable "get_ami" {
   type = string
