@@ -91,15 +91,19 @@ jobs:
           terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" 
           INSTANCE_PUBLIC_IP=$(terraform output public_ip | tr -d '"')
           echo "ip=${INSTANCE_PUBLIC_IP}" >> $GITHUB_ENV
+          - name: Wait 2 minutes
+
+      - name: Wait 2 minutes
+        run: sleep 2m
 
       - name: Copy Java ZIP file to EC2 instance
         run: |
-          scp -i ~/.ssh/ec2 codedeploy_artifact/csye6225-web-app.zip ec2-user@${{env.ip}}:/home/tomcat/csye6225-web-app.zip
+          scp -i ~/.ssh/ec2 codedeploy_artifact/csye6225-web-app.zip ec2-user@${{env.ip}}:~
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ~/.ssh/ec2 ec2-user@${{env.ip}} "unzip /home/tomcat/csye6225-web-app.zip -d /opt/tomcat/webapps/"
+          ssh -i ~/.ssh/ec2 ec2-user@${{env.ip}} "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
 
       - name: Start application on EC2 using screen
         run: |
-          ssh -i ~/.ssh/ec2 ec2-user@${{env.ip}} "screen -dmS csye6225-web-app java -jar /opt/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
+          ssh -i ~/.ssh/ec2 ec2-user@${{env.ip}} "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
