@@ -84,9 +84,6 @@ jobs:
         id: terraform-apply
         run: |
           cd aws-infra-main
-          cd packer
-          packer build -var "aws_access_key=${aws_access_key_dev}" -var "aws_secret_key=${aws_secret_key_dev}" ami.json
-          cd ..
           terraform init
           terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" 
           INSTANCE_PUBLIC_IP=$(terraform output public_ip | tr -d '"')
