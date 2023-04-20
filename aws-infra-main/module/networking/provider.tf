@@ -276,29 +276,27 @@ resource "aws_iam_role_policy_attachment" "webapp_s3_attachment" {
 
 
 resource "aws_iam_role" "webapp" {
-  name = "webapp-role"
+  name = "my-ec2-instance"
 
   assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
+    Version = "2012-10-17"
+    Statement = [
       {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "ec2.amazonaws.com"
-        },
-        "Action" : "sts:AssumeRole"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
       },
       {
-        "Effect" : "Allow",
-        "Action" : [
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:DescribeLogStreams"
         ],
-        "Resource" : [
-          "arn:aws:logs:*:*:*"
-        ]
+        Effect   = "Allow",
+        Resource = "*"
       }
     ]
   })
