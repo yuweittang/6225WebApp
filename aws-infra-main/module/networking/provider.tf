@@ -144,8 +144,8 @@ resource "aws_instance" "web" {
 }
 
 resource "aws_route53_record" "webapp" {
-  zone_id = "Z06372652JFX5EAWCRU6D"
-  name    = "yvot.me.tld"
+  zone_id = "Z06282863G0ABITAP79RM"
+  name    = "prod.yvot.me.tld"
   type    = "A"
   ttl     = "300"
   records = ["${aws_instance.web.private_ip}"]
@@ -288,6 +288,22 @@ resource "aws_iam_role" "webapp" {
           Service = "ec2.amazonaws.com"
         }
 
+      }
+    ]
+    }, {
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        "Resource" : [
+          "arn:aws:logs:*:*:*"
+        ]
       }
     ]
   })
