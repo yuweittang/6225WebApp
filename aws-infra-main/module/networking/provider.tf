@@ -287,22 +287,37 @@ resource "aws_iam_role" "webapp" {
         Principal = {
           Service = "ec2.amazonaws.com"
         }
-      },
-      {
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:DescribeLogStreams"
-        ],
-        Effect   = "Allow",
-        Resource = "*"
+
       }
     ]
   })
 }
 
 
+resource "aws_iam_policy" "cloudwatch_logs_policy" {
+  name        = "cloudwatch_logs_policy"
+  description = "Allows EC2 instances to write to CloudWatch Logs"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_logs_policy_attachment" {
+  policy_arn = aws_iam_policy.cloudwatch_logs_policy.arn
+  role       = aws_iam_role.webapp.name
+}
 
 resource "aws_iam_instance_profile" "ec2" {
   name = "iam_ec2"
