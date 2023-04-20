@@ -85,6 +85,7 @@ jobs:
         run: |
           cd aws-infra-main
           terraform init
+          terraform destroy -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" 
           terraform apply -auto-approve -var "aws_access_key=${aws_access_key_demo}" -var "aws_secret_key=${aws_secret_key_demo}" 
           INSTANCE_PUBLIC_IP=$(terraform output public_ip | tr -d '"')
           echo "ip=${INSTANCE_PUBLIC_IP}" >> $GITHUB_ENV
