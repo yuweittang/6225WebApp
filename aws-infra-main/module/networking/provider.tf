@@ -143,6 +143,14 @@ resource "aws_instance" "web" {
     EOF
 }
 
+resource "aws_route53_record" "webapp" {
+  zone_id = var.route53_zone_id
+  name    = "yvot.me.tld"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.web.private_ip}"]
+}
+
 
 output "public_ip" {
   value = aws_instance.web.public_ip

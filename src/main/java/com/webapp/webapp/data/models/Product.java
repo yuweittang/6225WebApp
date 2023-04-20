@@ -32,7 +32,9 @@ public class Product {
     private LocalDateTime date_last_updated;
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int owner_user_id;
-
+    public Product(){
+        
+    }
     /**
      * @return int return the id
      */
