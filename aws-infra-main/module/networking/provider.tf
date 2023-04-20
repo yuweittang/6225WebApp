@@ -144,7 +144,7 @@ resource "aws_instance" "web" {
 }
 
 resource "aws_route53_record" "webapp" {
-  zone_id = var.route53_zone_id
+  zone_id = "Z06372652JFX5EAWCRU6D"
   name    = "yvot.me.tld"
   type    = "A"
   ttl     = "300"
