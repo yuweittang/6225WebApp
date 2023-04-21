@@ -63,7 +63,8 @@ jobs:
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -o StrictHostKeyChecking=no -tt ec2-user@35.90.193.213 "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+         ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -o StrictHostKeyChecking=no -tt ec2-user@35.90.193.213 "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+
 
 
       - name: Start application on EC2 using screen
