@@ -46,7 +46,7 @@
             "inline": [
                 "sudo yum update -y",
                 "sudo amazon-linux-extras install epel",
-                "sudo yum install -y java-11-openjdk-devel",
+                "sudo amazon-linux-extras install -y java-openjdk11",
                 "sudo alternatives --config java",
                 "1",
                 "wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz",
