@@ -97,11 +97,12 @@ resource "aws_instance" "web" {
   # }
 
   user_data = <<-EOF
-  
+
 #!/bin/bash
 cd /usr/local/tomcat/bin
 
 touch setenv.sh
+
 
 echo "#!/bin/sh" > setenv.sh
 
@@ -110,9 +111,8 @@ echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
 echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
 
 sudo chown ec2-user:ec2-user setenv.sh
-
 chmod +x setenv.sh
-source /usr/local/tomcat/bin/setenv.sh
+source setenv.sh
 
 sudo chmod 755 -R /usr/local/tomcat
 
