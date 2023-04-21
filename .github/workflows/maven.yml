@@ -75,10 +75,12 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUB}}
+          SSH_KNOWN_HOSTS_PROD: ${{ secrets.HOST }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/ec2
           chmod 600 ~/.ssh/ec2
+          echo "$SSH_KNOWN_HOSTS_PROD" > ~/.ssh/known_hosts
 
       - name: Copy file to remote server
         uses: appleboy/scp-action@master
@@ -92,8 +94,8 @@ jobs:
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=/github/home/.ssh/known_hosts -tt ec2-user@35.90.193.213 "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -tt ec2-user@35.90.193.213 "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
 
       - name: Start application on EC2 using screen
         run: |
-          ssh -i ~/.ssh/ec2 ec2-user@35.90.193.213 "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -tt ec2-user@35.90.193.213 "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
