@@ -85,7 +85,7 @@ jobs:
         with:
           host: 35.90.193.213
           username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # Private key stored in GitHub secrets
+          key: ~/.ssh/ec2 # Private key stored in GitHub secrets
           port: 22
           source: codedeploy_artifact/csye6225-web-app.zip
           target: ~/ # Destination directory in the remote server
