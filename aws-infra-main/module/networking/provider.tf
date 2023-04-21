@@ -97,90 +97,64 @@ resource "aws_instance" "web" {
   # }
 
   user_data = <<-EOF
-
-  #!/bin/bash
-
-
-  cd /usr/local/tomcat/bin
-
-  touch setenv.sh
-
-  echo "#!/bin/sh" > setenv.sh
-
-  echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
-  echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
-  echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
-
-
-  chown tomcat:tomcat setenv.sh
-
-  chmod +x setenv.sh
-  source /usr/local/tomcat/bin/setenv.sh
-
-  sudo chmod 755 -R /opt/tomcat
-
-  # Start Tomcat
   
-  sudo /usr/local/tomcat/bin/startup.sh
-  yum install mysql client 
+#!/bin/bash
+cd /usr/local/tomcat/bin
 
-  echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /opt/tomcat/bin/setenv.sh
-  
-  root_block_device {
-    volume_size = var.root_volFume_size
-    volume_type = var.root_volume_type
-  }
+touch setenv.sh
 
-  lifecycle {
-    prevent_destroy = false
-  }
+echo "#!/bin/sh" > setenv.sh
 
-  tags = {
-    Name = "my-instance"
-  }
-  }
+echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
+echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
+echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
+
+sudo chown ec2-user:ec2-user setenv.sh
+
+chmod +x setenv.sh
+source /usr/local/tomcat/bin/setenv.sh
+
+sudo chmod 755 -R /usr/local/tomcat
+
+# Start Tomcat
+sudo /usr/local/tomcat/bin/startup.sh
+
+yum install -y mysql
+
+echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /usr/local/tomcat/bin/setenv.sh
+
+# Install CloudWatch Agent
+yum install -y amazon-cloudwatch-agent
+
+# Configure CloudWatch Agent
 echo "Creating CloudWatch Agent config file..."
- cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
-              {
-                "agent": {
-                    "metrics_collection_interval": 10,
-                    "logfile": "/var/logs/amazon-cloudwatch-agent.log"
-                },
-                "logs": {
-                    "logs_collected": {
-                        "files": {
-                            "collect_list": [
-                                {
-                                    "file_path": "/var/log/tomcat9/csye6225.log",
-                                    "log_group_name": "csye6225",
-                                    "log_stream_name": "webapp"
-                                }
-                            ]
-                        }
-                    },
-                    "log_stream_name": "cloudwatch_log_stream"
-                },
-                "metrics":{
-                  "metrics_collected":{
-                     "statsd":{
-                        "service_address":":8125",
-                        "metrics_collection_interval":15,
-                        "metrics_aggregation_interval":300
-                     }
-                  }
-                 }
-              }
-              CONFIG
-              
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-    -a fetch-config \
-    -m ec2 \
-    -c file:/opt/cloudwatch-config.json \
-    -s
+cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
+{
+    "agent": {
+        "metrics_collection_interval": 10,
+        "logfile": "/var/logs/amazon-cloudwatch-agent.log"
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/usr/local/tomcat/logs/csye6225.log",
+                        "log_group_name": "csye6225",
+                        "log_stream_name": "{instance_id}"
+                    }
+                ]
+            }
+        }
+    }
+}
+CONFIG
 
+# Start CloudWatch Agent
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
 
+EOF
 
-    EOF
 }
 
 resource "aws_route53_record" "webapp" {
@@ -363,4 +337,24 @@ resource "aws_iam_instance_profile" "ec2" {
   name = "iam_ec2"
   role = aws_iam_role.webapp.name
 }
+
+resource "aws_security_group" "load_balancer_sg" {
+  name_prefix = "load_balancer_sg_"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "load_balancer_sg"
+  }
+}
+
 
