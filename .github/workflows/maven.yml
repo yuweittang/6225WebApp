@@ -35,14 +35,7 @@ jobs:
           java-version: "11"
           distribution: "temurin"
           cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-      - name: Build Artifact
-        run: |
-          mvn clean install
-          cd target
 
-     
       - name: Install awscli
         run: |
           sudo apt-get update
@@ -67,16 +60,6 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/ec2
           chmod 600 ~/.ssh/ec2
           echo "$SSH_KNOWN_HOSTS_PROD" > ~/.ssh/known_hosts
-
-      - name: Copy file to remote server
-        uses: appleboy/scp-action@master
-        with:
-          host: 35.90.193.213
-          username: ec2-user
-          key: ${{secrets.SSH_PRIVATE}} # Private key stored in GitHub secrets
-          port: 22
-          source: codedeploy_artifact/csye6225-web-app.zip
-          target: ~/ # Destination directory in the remote server
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
