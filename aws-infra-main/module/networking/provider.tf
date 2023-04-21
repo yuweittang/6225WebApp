@@ -139,12 +139,8 @@ resource "aws_instance" "web" {
     Name = "my-instance"
   }
   }
-                echo "Downloading and installing CloudWatch Agent..."
-              wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-              sudo rpm -U ./amazon-cloudwatch-agent.rpm
-              
-              echo "Creating CloudWatch Agent config file..."
-              cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
+echo "Creating CloudWatch Agent config file..."
+ cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
               {
                 "agent": {
                     "metrics_collection_interval": 10,

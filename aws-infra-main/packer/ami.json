@@ -46,15 +46,13 @@
             "inline": [
                 "sudo yum update -y",
                 "sudo amazon-linux-extras install java-openjdk11",
-                "sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz",
-                "sudo tar xvzf apache-tomcat-9.0.74.tar.gz",
+                "wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz",
+                "tar xvzf apache-tomcat-9.0.74.tar.gz",
                 "sudo mv apache-tomcat-9.0.74 /usr/local/tomcat",
-                "sudo export CATALINA_HOME=/usr/local/tomcat",
+                "export CATALINA_HOME=/usr/local/tomcat",
                 "sudo chmod +x /usr/local/tomcat/bin/*.sh",
-                "sudo curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O",
-                "sudo chmod +x ./awslogs-agent-setup.py",
-                "sudo ./awslogs-agent-setup.py -n -r us-west-2 -c /tmp/cwlogs.cfg",
-                "sudo service awslogs start"
+                "wget https://s3.us-west-2.amazonaws.com/amazoncloudwatch-agent-us-west-2/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm",
+                "sudo rpm -U ./amazon-cloudwatch-agent.rpm"
             ]
         }
     ]
