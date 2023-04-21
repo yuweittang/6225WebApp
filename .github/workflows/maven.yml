@@ -42,21 +42,7 @@ jobs:
           mvn clean install
           cd target
 
-      - name: Zip Artifact
-        run: echo "current build number is "
-          pwd
-          mkdir -p codedeploy_artifact
-          cd codedeploy_artifact
-          cp ../pom.xml .
-          cp ../target/webapp-0.0.1-SNAPSHOT.jar .
-          cp ../src/main/resources/*.properties .
-          zip -r csye6225-web-app.zip .
-          rm *.xml *.properties *.jar
-          ls -al
-          pwd
-          cd ..
-          pwd
-
+     
       - name: Install awscli
         run: |
           sudo apt-get update
@@ -94,7 +80,8 @@ jobs:
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -tt ec2-user@35.90.193.213 "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -o StrictHostKeyChecking=no -tt ec2-user@35.90.193.213 "unzip /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+
 
       - name: Start application on EC2 using screen
         run: |
