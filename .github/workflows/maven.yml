@@ -69,4 +69,4 @@ jobs:
 
       - name: Start application on EC2 using screen
         run: |
-          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts -tt ec2-user@35.90.193.213 "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@35.90.193.213 "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
