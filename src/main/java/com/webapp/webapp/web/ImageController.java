@@ -35,8 +35,8 @@ import java.util.Optional;
 @RequestMapping("/v1/product")
 public class ImageController {
   
-    private String accessKey="AKIA47DNXORGQQOUD3MH";
-    private String secretKey="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";
+    private String accessKey="";
+    private String secretKey="";
     // Set up S3 bucket name and region
     // private final String bucketName = System.getenv("S3_BUCKET_NAME");
     private final String region = "us-west-2";
@@ -82,6 +82,7 @@ public class ImageController {
         imageEntity.setImage_id(productId);
         imageEntity.setS3_bucket_path("https://s3-"+region+".amazonaws.com/"+"my-bucket-0511d18f3331fbc3"+"/"+key);
         
+
     return new ResponseEntity<>(imageEntity, HttpStatus.OK);
 }
 
