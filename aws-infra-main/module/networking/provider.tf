@@ -151,8 +151,8 @@ cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
                 "collect_list": [
                     {
                         "file_path": "/usr/local/tomcat/logs/csye6225.log",
-                        "log_group_name": "{aws_cloudwatch_log_group.web.name}",
-                        "log_stream_name": "{aws_cloudwatch_log_stream.web.name}"
+                        "log_group_name": "${aws_cloudwatch_log_group.web.name}",
+                        "log_stream_name": "${aws_cloudwatch_log_stream.web.name}"
                     }
                 ]
             }
