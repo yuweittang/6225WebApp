@@ -40,7 +40,6 @@ jobs:
       - name: Build Artifact
         run: |
           mvn clean install
-          cd target
 
       - name: Zip Artifact
         run: echo "current build number is "
@@ -107,7 +106,7 @@ jobs:
 
       - name: Extract Java ZIP file on EC2 instance
         run: |
-          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "unzip -o /home/ec2-user/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "unzip -o /home/ec2-user/codedeploy_artifact/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
       - name: Start application on EC2 using screen
         run: |
           ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"

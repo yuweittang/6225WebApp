@@ -80,6 +80,14 @@ resource "aws_security_group" "web" {
 #var.aws_secret_key
 # }
 
+resource "aws_cloudwatch_log_group" "web" {
+  name = "/csye6225/logs"
+}
+
+resource "aws_cloudwatch_log_stream" "web" {
+  name           = "csye6225"
+  log_group_name = aws_cloudwatch_log_group.web.name
+}
 
 resource "aws_instance" "web" {
   ami                         = var.get_ami
@@ -112,7 +120,7 @@ echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
 
 sudo chown ec2-user:ec2-user setenv.sh
 chmod +x setenv.sh
-source setenv.sh
+
 
 sudo chmod 755 -R /usr/local/tomcat
 
@@ -122,6 +130,8 @@ sudo /usr/local/tomcat/bin/startup.sh
 yum install -y mysql
 
 echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /usr/local/tomcat/bin/setenv.sh
+
+source setenv.sh
 
 # Install CloudWatch Agent
 yum install -y amazon-cloudwatch-agent
@@ -140,13 +150,22 @@ cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
                 "collect_list": [
                     {
                         "file_path": "/usr/local/tomcat/logs/csye6225.log",
-                        "log_group_name": "csye6225",
-                        "log_stream_name": "{instance_id}"
+                        "log_group_name": "${aws_cloudwatch_log_group.web.name}",
+                        "log_stream_name": "${aws_cloudwatch_log_stream.web.name}"
                     }
                 ]
             }
         }
+    },
+  "metrics":{
+    "metrics_collected":{
+       "statsd":{
+          "service_address":":8125",
+          "metrics_collection_interval":15,
+          "metrics_aggregation_interval":300
+       }
     }
+ }
 }
 CONFIG
 

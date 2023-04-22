@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.method.P;
+import org.springframework.stereotype.Service;
 
 import com.amazonaws.Request;
 import com.webapp.webapp.data.models.Image;
@@ -12,13 +13,13 @@ import com.webapp.webapp.data.repository.ImageRepository;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
+@Service
 public class ImageServiceImp implements ImageService{
     @Autowired
     ImageRepository imageRepository;
     @Override
-    public Image createImage(int productId,int imageId,String fileName){
-        Image image=new Image();
-        image.setImage_id(imageId);
+    public Image createImage(int productId,String fileName){
+        Image image=new Image(); 
         image.setProduct_id(productId);
         image.setFile_name(fileName);
         imageRepository.save(image);

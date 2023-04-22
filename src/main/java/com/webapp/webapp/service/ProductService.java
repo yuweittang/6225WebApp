@@ -10,10 +10,7 @@ import com.webapp.webapp.data.payloads.request.ProductRequest;
 @Component
 public interface ProductService {
     Product createProduct(ProductRequest productRequest);
-
     Optional<Product> updateProduct(Integer productId, ProductRequest productRequest);
-
     Optional<Product> getAProduct(Integer productId);
-
     void deleteProduct(Integer productId);
 }

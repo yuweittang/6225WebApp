@@ -17,7 +17,7 @@ public class WebappApplication {
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
-
+		
 	}
 
 }
