@@ -107,6 +107,9 @@ jobs:
       - name: Extract Java ZIP file on EC2 instance
         run: |
           ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "unzip -o /home/ec2-user/codedeploy_artifact/csye6225-web-app.zip -d /usr/local/tomcat/webapps"
+      - name: Source setenv.sh
+        run: |
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "source /usr/local/tomcat/bin/setenv.sh"
       - name: Start application on EC2 using screen
         run: |
-          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "screen -dmS csye6225-web-app java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
+          ssh -i ~/.ssh/ec2 -o UserKnownHostsFile=~/.ssh/known_hosts.old -o StrictHostKeyChecking=no -tt ec2-user@${{env.ip}} "java -jar /usr/local/tomcat/webapps/webapp-0.0.1-SNAPSHOT.jar"
