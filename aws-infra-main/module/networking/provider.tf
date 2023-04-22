@@ -167,10 +167,7 @@ echo '
             }
         }
     },
-    "metrics": {
-        "append_dimensions": {
-            "InstanceId": "${aws_instance.web.id}"
-        },
+    "metrics":
         "metrics_collected": {
             "statsd": {
                 "service_address": ":8125",
