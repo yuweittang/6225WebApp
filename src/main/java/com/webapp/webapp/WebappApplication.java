@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
- @EnableJpaAuditing
+@EnableJpaAuditing
 public class WebappApplication {
 
 	public static void main(String[] args) {
@@ -17,7 +17,7 @@ public class WebappApplication {
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
-		
+
 	}
 
 }
