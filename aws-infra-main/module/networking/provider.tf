@@ -109,6 +109,11 @@ resource "aws_instance" "web" {
   #   user        = "ec2-user"
   #   private_key = file("~/.ssh/ec2")
   #   timeout     = "2m"
+  #   echo "#!/bin/sh" > setenv.sh
+  # echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
+  # echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
+  # echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
+  #echo "export S3_BUCKET_NAME=${aws_s3_bucket.private_bucket.id}" >> /usr/local/tomcat/bin/setenv.sh
   # }
 
   user_data = <<-EOF
@@ -198,7 +203,7 @@ EOF
 
 resource "aws_route53_record" "webapp" {
   zone_id = "Z06282863G0ABITAP79RM"
-  name    = "prod.yvot.me.tld"
+  name    = "dev.yvot.me.tld"
   type    = "A"
   ttl     = "300"
   records = ["${aws_instance.web.private_ip}"]
