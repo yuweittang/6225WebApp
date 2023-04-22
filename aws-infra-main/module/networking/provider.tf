@@ -201,13 +201,13 @@ EOF
 
 }
 
-resource "aws_route53_record" "webapp" {
-  zone_id = "Z06282863G0ABITAP79RM"
-  name    = "dev.yvot.me.tld"
-  type    = "A"
-  ttl     = "300"
-  records = ["${aws_instance.web.private_ip}"]
-}
+# resource "aws_route53_record" "webapp" {
+#   zone_id = "Z06282863G0ABITAP79RM"
+#   name    = "dev.yvot.me.tld"
+#   type    = "A"
+#   ttl     = "300"
+#   records = ["${aws_instance.web.private_ip}"]
+# }
 
 
 output "public_ip" {
