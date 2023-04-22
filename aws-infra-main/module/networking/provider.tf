@@ -79,15 +79,18 @@ resource "aws_security_group" "web" {
 #var.aws_access_key
 #var.aws_secret_key
 # }
+# echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
+# echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
+# echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
 
-resource "aws_cloudwatch_log_group" "web" {
-  name = "/csye6225/logs"
-}
+# resource "aws_cloudwatch_log_group" "web" {
+#   name = "/csye6225/logs"
+# }
 
-resource "aws_cloudwatch_log_stream" "web" {
-  name           = "csye6225"
-  log_group_name = aws_cloudwatch_log_group.web.name
-}
+# resource "aws_cloudwatch_log_stream" "web" {
+#   name           = "csye6225"
+#   log_group_name = aws_cloudwatch_log_group.web.name
+# }
 
 resource "aws_instance" "web" {
   ami                         = var.get_ami
@@ -114,9 +117,7 @@ touch setenv.sh
 
 echo "#!/bin/sh" > setenv.sh
 
-echo "export DB_USERNAME=${var.database_username}" >> setenv.sh
-echo "export DB_PASSWORD=${var.database_password}" >> setenv.sh
-echo "export DB_HOSTNAME=${aws_db_instance.mysqlDB.endpoint}" >> setenv.sh
+
 
 sudo chown ec2-user:ec2-user setenv.sh
 chmod +x setenv.sh
@@ -150,8 +151,8 @@ cat > /opt/aws/amazon-cloudwatch-agent/bin/config.json <<-CONFIG
                 "collect_list": [
                     {
                         "file_path": "/usr/local/tomcat/logs/csye6225.log",
-                        "log_group_name": "${aws_cloudwatch_log_group.web.name}",
-                        "log_stream_name": "${aws_cloudwatch_log_stream.web.name}"
+                        "log_group_name": "{aws_cloudwatch_log_group.web.name}",
+                        "log_stream_name": "{aws_cloudwatch_log_stream.web.name}"
                     }
                 ]
             }
