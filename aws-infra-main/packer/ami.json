@@ -1,60 +1,61 @@
-"variables": {
-    "aws_access_key": "",
-    "aws_secret_key": "",
-    "ami_region": "us-west-2",
-    "source_ami": "ami-0b029b1931b347543",
-    "instance_type": "t2.micro",
-    "name": "csye6225"
-},
-"builders": [
-    {
-        "type": "amazon-ebs",
-        "vpc_id": "vpc-020183a1c72b7513d",
-        "subnet_id": "subnet-0af1be88810e0056c",
-        "ssh_interface": "public_ip",
-        "access_key": "{{user `aws_access_key`}}",
-        "secret_key": "{{user `aws_secret_key`}}",
-        "region": "us-west-2",
-        "source_ami": "{{user `source_ami`}}",
-        "instance_type": "{{user `instance_type`}}",
-        "ssh_username": "ec2-user",
-        "temporary_key_pair_type": "ed25519",
-        "ami_name": "{{user `name`}}",
-        "ami_description": "AMI ubuntu",
-        "associate_public_ip_address": true,
-        "ami_users": [
-            "056163450361",
-            "891435840589",
-            "516646356527"
-        ],
-        "launch_block_device_mappings": [
-            {
-                "device_name": "/dev/xvda",
-                "volume_size": 17,
-                "volume_type": "gp2",
-                "delete_on_termination": true
+{
+    "variables": {
+        "aws_access_key": "",
+        "aws_secret_key": "",
+        "ami_region": "us-west-2",
+        "source_ami": "ami-0b029b1931b347543",
+        "instance_type": "t2.micro",
+        "name": "csye6225"
+    },
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "vpc_id": "vpc-020183a1c72b7513d",
+            "subnet_id": "subnet-0af1be88810e0056c",
+            "ssh_interface": "public_ip",
+            "access_key": "{{user `aws_access_key`}}",
+            "secret_key": "{{user `aws_secret_key`}}",
+            "region": "us-west-2",
+            "source_ami": "{{user `source_ami`}}",
+            "instance_type": "{{user `instance_type`}}",
+            "ssh_username": "ec2-user",
+            "temporary_key_pair_type": "ed25519",
+            "ami_name": "{{user `name`}}",
+            "ami_description": "AMI ubuntu",
+            "associate_public_ip_address": true,
+            "ami_users": [
+                "056163450361",
+                "891435840589",
+                "516646356527"
+            ],
+            "launch_block_device_mappings": [
+                {
+                    "device_name": "/dev/xvda",
+                    "volume_size": 17,
+                    "volume_type": "gp2",
+                    "delete_on_termination": true
+                }
+            ],
+            "tags": {
+                "Name": "{{user `name`}}"
             }
-        ],
-        "tags": {
-            "Name": "{{user `name`}}"
         }
-    }
-],
-"provisioners": [
-    {
-        "type": "shell",
-        "inline": [
-            "sudo yum update -y",
-            "sudo amazon-linux-extras install epel",
-            "sudo amazon-linux-extras install -y java-openjdk11",
-            "wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz",
-            "tar xvzf apache-tomcat-9.0.74.tar.gz",
-            "sudo mv apache-tomcat-9.0.74 /usr/local/tomcat",
-            "export CATALINA_HOME=/usr/local/tomcat",
-            "sudo chmod +x /usr/local/tomcat/bin/*.sh",
-            "wget https://s3.us-west-2.amazonaws.com/amazoncloudwatch-agent-us-west-2/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm",
-            "sudo rpm -U ./amazon-cloudwatch-agent.rpm"
-        ]
-    }
-]
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sudo yum update -y",
+                "sudo amazon-linux-extras install epel",
+                "sudo amazon-linux-extras install -y java-openjdk11",
+                "wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.tar.gz",
+                "tar xvzf apache-tomcat-9.0.74.tar.gz",
+                "sudo mv apache-tomcat-9.0.74 /usr/local/tomcat",
+                "export CATALINA_HOME=/usr/local/tomcat",
+                "sudo chmod +x /usr/local/tomcat/bin/*.sh",
+                "wget https://s3.us-west-2.amazonaws.com/amazoncloudwatch-agent-us-west-2/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm",
+                "sudo rpm -U ./amazon-cloudwatch-agent.rpm"
+            ]
+        }
+    ]
 }

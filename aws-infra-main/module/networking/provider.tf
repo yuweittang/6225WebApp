@@ -28,24 +28,24 @@ resource "aws_security_group" "web" {
   }
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-    # security_groups = [aws_security_group.load_balancer_sg.id]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.load_balancer_sg.id]
   }
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    # security_groups = [aws_security_group.load_balancer_sg.id]
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.load_balancer_sg.id]
   }
 
   ingress {
-    from_port = 8080
-    to_port   = 8080
-    protocol  = "tcp"
-    # security_groups = [aws_security_group.load_balancer_sg.id]
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [aws_security_group.load_balancer_sg.id]
   }
 
   ingress {
@@ -63,9 +63,9 @@ resource "aws_security_group" "web" {
   }
 }
 
-# output "load_balancer_sg_id" {
-#   value = aws_security_group.load_balancer_sg.id
-# }
+output "load_balancer_sg_id" {
+  value = aws_security_group.load_balancer_sg.id
+}
 
 # resource "aws_key_pair" "ec2_public" {
 #   key_name   = "public-keypair"
@@ -201,13 +201,13 @@ EOF
 
 }
 
-# resource "aws_route53_record" "webapp" {
-#   zone_id = "Z06282863G0ABITAP79RM"
-#   name    = "dev.yvot.me.tld"
-#   type    = "A"
-#   ttl     = "300"
-#   records = ["${aws_instance.web.private_ip}"]
-# }
+resource "aws_route53_record" "webapp" {
+  zone_id = "Z06282863G0ABITAP79RM"
+  name    = "prod.yvot.me.tld"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.web.private_ip}"]
+}
 
 
 output "public_ip" {
@@ -382,101 +382,136 @@ resource "aws_iam_instance_profile" "ec2" {
   role = aws_iam_role.webapp.name
 }
 
-# resource "aws_security_group" "load_balancer_sg" {
-#   name_prefix = "load_balancer_sg_"
-#   ingress {
-#     from_port   = 80
-#     to_port     = 80
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-#   ingress {
-#     from_port   = 443
-#     to_port     = 443
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-#   tags = {
-#     Name = "load_balancer_sg"
-#   }
-# }
+resource "aws_security_group" "load_balancer_sg" {
+  name_prefix = "load_balancer_sg_"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "load_balancer_sg"
+  }
+}
 
-# resource "aws_launch_configuration" "asg_launch_config" {
-#   name                        = "asg_launch_config"
-#   image_id                    = var.get_ami
-#   instance_type               = "t2.micro"
-#   key_name                    = "YOUR_AWS_KEYNAME"
-#   associate_public_ip_address = true
-#   user_data                   = aws_instance.web.user_data
-#   iam_instance_profile        = aws_iam_instance_profile.ec2.name
-#   security_groups             = [aws_security_group.web.id]
-# }
+resource "aws_launch_configuration" "asg_launch_config" {
+  name                        = "asg_launch_config"
+  image_id                    = var.get_ami
+  instance_type               = "t2.micro"
+  key_name                    = "ec2"
+  associate_public_ip_address = true
+  user_data                   = aws_instance.web.user_data
+  iam_instance_profile        = aws_iam_instance_profile.ec2.name
+  security_groups             = [aws_security_group.web.id]
+}
 
-# resource "aws_autoscaling_group" "asg" {
-#   name                 = "asg"
-#   launch_configuration = aws_launch_configuration.asg_launch_config.id
-#   # vpc_zone_identifier  = [aws_subnet.your_subnet.id] # Replace with your VPC subnet ID
+resource "aws_autoscaling_group" "asg" {
+  name                 = "asg"
+  launch_configuration = aws_launch_configuration.asg_launch_config.id
+  # vpc_zone_identifier  = [aws_subnet.your_subnet.id] # Replace with your VPC subnet ID
 
-#   min_size                  = 1
-#   max_size                  = 3
-#   health_check_grace_period = 300
-#   health_check_type         = "EC2"
-#   tags = [
-#     {
-#       key                 = "Name"
-#       value               = "WebAppInstance"
-#       propagate_at_launch = true
-#     },
-#     {
-#       key                 = "Environment"
-#       value               = "production"
-#       propagate_at_launch = true
-#     }
-#   ]
-# }
-# resource "aws_autoscaling_policy" "scale_up_policy" {
-#   name                   = "scale-up-policy"
-#   policy_type            = "SimpleScaling"
-#   autoscaling_group_name = aws_autoscaling_group.asg.name
+  min_size                  = 1
+  max_size                  = 3
+  health_check_grace_period = 300
+  health_check_type         = "EC2"
+  tags = [
+    {
+      key                 = "Name"
+      value               = "WebAppInstance"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Environment"
+      value               = "production"
+      propagate_at_launch = true
+    }
+  ]
+}
+resource "aws_autoscaling_policy" "scale_up_policy" {
+  name                   = "scale-up-policy"
+  policy_type            = "SimpleScaling"
+  autoscaling_group_name = aws_autoscaling_group.asg.name
 
-#   adjustment_type    = "ChangeInCapacity"
-#   scaling_adjustment = 1
+  adjustment_type    = "ChangeInCapacity"
+  scaling_adjustment = 1
 
-#   metric_aggregation_type = "Average"
-#   step_adjustment {
-#     metric_interval_lower_bound = 0
-#     scaling_adjustment          = 1
-#   }
-#   estimated_instance_warmup = 60
+  metric_aggregation_type   = "Average"
+  estimated_instance_warmup = 60
 
-#   target_tracking_configuration {
-#     predefined_metric_specification {
-#       predefined_metric_type = "ASGAverageCPUUtilization"
-#     }
-#     target_value = 5.0
-#   }
-# }
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 5.0
+  }
+}
 
-# resource "aws_autoscaling_policy" "scale_down_policy" {
-#   name                   = "scale-down-policy"
-#   policy_type            = "SimpleScaling"
-#   autoscaling_group_name = aws_autoscaling_group.asg.name
+resource "aws_autoscaling_policy" "scale_down_policy" {
+  name                   = "scale-down-policy"
+  policy_type            = "SimpleScaling"
+  autoscaling_group_name = aws_autoscaling_group.asg.name
 
-#   adjustment_type    = "ChangeInCapacity"
-#   scaling_adjustment = -1
+  adjustment_type    = "ChangeInCapacity"
+  scaling_adjustment = -1
 
-#   metric_aggregation_type = "Average"
-#   step_adjustment {
-#     metric_interval_upper_bound = 0
-#     scaling_adjustment          = -1
-#   }
-#   estimated_instance_warmup = 60
+  metric_aggregation_type = "Average"
 
-#   target_tracking_configuration {
-#     predefined_metric_specification {
-#       predefined_metric_type = "ASGAverageCPUUtilization"
-#     }
-#     target_value = 3.0
-#   }
-# }
+  estimated_instance_warmup = 60
 
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 3.0
+  }
+}
+resource "aws_lb" "webapp" {
+  name               = "webapp-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.lb.id]
+  subnets            = [aws_subnet.myprivatesubnet1.id, aws_subnet.myprivatesubnet2.id, aws_subnet.myprivatesubnet3.id]
+
+  tags = {
+    Name = "webapp-lb"
+  }
+
+  enable_deletion_protection = false
+
+  listener {
+    port     = 80
+    protocol = "HTTP"
+
+    default_action {
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.webapp.arn
+    }
+  }
+}
+resource "aws_lb_target_group" "webapp" {
+  name_prefix = "webapp"
+  port        = 8080
+  protocol    = "HTTP"
+  target_type = "instance"
+  vpc_id      = aws_vpc.yvot.id
+  health_check {
+    path = "/healthz"
+  }
+}
+resource "aws_security_group" "lb" {
+  name_prefix = "webapp-lb-sg-"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
